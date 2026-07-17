@@ -1,0 +1,24 @@
+const express = require('express');
+const routes = require('./routes/api');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware to parse JSON body
+app.use(express.json());
+
+// Main API routes
+app.use('/', routes);
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    status: 'error',
+    message: err.message || 'Internal Server Error'
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
