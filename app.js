@@ -1,10 +1,12 @@
 const express = require('express');
+const cors = require('cors');
 const routes = require('./routes/api');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON body
+// Middleware to parse JSON body and enable CORS
+app.use(cors());
 app.use(express.json());
 
 // Main API routes
