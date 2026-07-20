@@ -9,7 +9,6 @@ const findLocation = async (query) => {
         addressdetails: 1
       },
       headers: {
-        // Nominatim API STRICTLY REQUIRES a User-Agent. Without it, the request might be blocked.
         'User-Agent': 'DataAcquisitionEngine/1.0 (contact@example.com)'
       },
       timeout: 10000 // 10 seconds timeout
@@ -20,8 +19,6 @@ const findLocation = async (query) => {
     if (!data || data.length === 0) {
       throw new Error('Location not found');
     }
-
-    // We take the first result as the most relevant match
     const bestMatch = data[0];
 
     return {

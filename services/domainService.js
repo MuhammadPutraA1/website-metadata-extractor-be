@@ -2,16 +2,14 @@ const axios = require('axios');
 
 const extractDomainInfo = async (domain) => {
   try {
-    // Basic validation to clean up the domain
     let cleanDomain = domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0];
 
     const response = await axios.get(`https://rdap.org/domain/${cleanDomain}`, {
-      timeout: 10000 // 10 seconds timeout
+      timeout: 10000 
     });
     
     const data = response.data;
     
-    // Parse Registrar
     let registrar = '';
     if (data.entities && Array.isArray(data.entities)) {
       const registrarEntity = data.entities.find(e => e.roles && e.roles.includes('registrar'));
@@ -23,7 +21,6 @@ const extractDomainInfo = async (domain) => {
       }
     }
 
-    // Parse Events (registered_at, expired_at, last_updated)
     let registered_at = '';
     let expired_at = '';
     let last_updated = '';
@@ -39,10 +36,8 @@ const extractDomainInfo = async (domain) => {
       if (updEvent) last_updated = updEvent.eventDate;
     }
 
-    // Parse Status
     const status = data.status || [];
 
-    // Parse Nameservers
     const nameservers = [];
     if (data.nameservers && Array.isArray(data.nameservers)) {
       data.nameservers.forEach(ns => {

@@ -3,7 +3,6 @@ const cheerio = require('cheerio');
 
 const extractWebsiteMetadata = async (url) => {
   try {
-    // Pastikan URL valid dan menggunakan protokol http/https
     if (!/^https?:\/\//i.test(url)) {
       url = 'https://' + url;
     }
@@ -12,7 +11,7 @@ const extractWebsiteMetadata = async (url) => {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
       },
-      timeout: 10000 // 10 seconds timeout
+      timeout: 10000 
     });
 
     const html = response.data;
@@ -24,11 +23,9 @@ const extractWebsiteMetadata = async (url) => {
     
     let canonical = $('link[rel="canonical"]').attr('href') || '';
     if (canonical && !canonical.startsWith('http')) {
-      // Resolve relative canonical URL if necessary
       try {
         canonical = new URL(canonical, url).href;
       } catch (e) {
-        // Fallback if URL parsing fails
       }
     }
 
@@ -37,11 +34,9 @@ const extractWebsiteMetadata = async (url) => {
       try {
         favicon = new URL(favicon, url).href;
       } catch (e) {
-        // Fallback
       }
     }
 
-    // Extracting Open Graph data
     const open_graph = {
       title: $('meta[property="og:title"]').attr('content') || title,
       description: $('meta[property="og:description"]').attr('content') || description,
@@ -53,7 +48,6 @@ const extractWebsiteMetadata = async (url) => {
        } catch (e) {}
     }
 
-    // Extracting Emails, Phones, and Social Media
     const emails = new Set();
     const phones = new Set();
     const social_media = new Set();
@@ -63,7 +57,6 @@ const extractWebsiteMetadata = async (url) => {
     const phoneRegex = /(?:\+62|62|0)[2-9][0-9]{7,11}/g; 
     const socialMediaDomains = ['facebook.com', 'twitter.com', 'instagram.com', 'linkedin.com', 'youtube.com', 'tiktok.com'];
 
-    // Extract from href attributes
     $('a').each((i, el) => {
       const href = $(el).attr('href');
       if (href) {
@@ -72,7 +65,6 @@ const extractWebsiteMetadata = async (url) => {
         } else if (href.startsWith('tel:')) {
           phones.add(href.replace('tel:', '').trim());
         } else {
-          // Check for social media links
           for (const domain of socialMediaDomains) {
             if (href.includes(domain)) {
               social_media.add(href.trim());
@@ -83,15 +75,13 @@ const extractWebsiteMetadata = async (url) => {
       }
     });
 
-    // Extract from text body (Optional enhancement, might be noisy but good for catching things missed in hrefs)
+   
     const bodyText = $('body').text();
     const foundEmails = bodyText.match(emailRegex);
     if (foundEmails) {
       foundEmails.forEach(e => emails.add(e));
     }
     
-    // We can also extract phones from text but it might result in false positives, 
-    // sticking mainly to standard formats or tel links is safer, but let's try a conservative regex for Indonesian numbers or standard ones.
     const foundPhones = bodyText.match(phoneRegex);
     if (foundPhones) {
       foundPhones.forEach(p => phones.add(p));
