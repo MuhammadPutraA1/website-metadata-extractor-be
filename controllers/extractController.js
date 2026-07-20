@@ -1,5 +1,6 @@
 const websiteService = require('../services/websiteService');
 const domainService = require('../services/domainService');
+const locationService = require('../services/locationService');
 
 const extractController = {
   extractWebsite: async (req, res, next) => {
@@ -25,6 +26,20 @@ const extractController = {
 
       const domainInfo = await domainService.extractDomainInfo(domain);
       res.json(domainInfo);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  extractLocation: async (req, res, next) => {
+    try {
+      const { query } = req.body;
+      if (!query) {
+        return res.status(400).json({ status: 'error', message: 'Query is required' });
+      }
+
+      const locationInfo = await locationService.findLocation(query);
+      res.json(locationInfo);
     } catch (error) {
       next(error);
     }
