@@ -43,6 +43,54 @@ const extractController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  getCompanyInformation: async (req, res, next) => {
+    try {
+      const { domain } = req.query;
+      if (!domain) {
+        return res.status(400).json({ status: 'error', message: 'Domain query parameter is required' });
+      }
+
+      const results = {
+        website: {},
+        domain: {},
+        location: {}
+      };
+
+      // 1. Fetch Website Metadata
+      try {
+        const url = `https://${domain}`;
+        results.website = await websiteService.extractWebsiteMetadata(url);
+      } catch (err) {
+        results.website = { error: err.message };
+      }
+
+      // 2. Fetch Domain Intelligence
+      try {
+        results.domain = await domainService.extractDomainInfo(domain);
+      } catch (err) {
+        results.domain = { error: err.message };
+      }
+
+      // 3. Fetch Location Finder
+      try {
+        let searchQuery = domain.split('.')[0]; 
+        if (results.website && results.website.title) {
+           const titleText = results.website.title.split(/[-|]/)[0].trim();
+           if (titleText.length > 3) {
+             searchQuery = titleText;
+           }
+        }
+        results.location = await locationService.findLocation(searchQuery);
+      } catch (err) {
+        results.location = { error: err.message };
+      }
+
+      res.json(results);
+    } catch (error) {
+      next(error);
+    }
   }
 };
 
