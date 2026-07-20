@@ -5,14 +5,11 @@ const routes = require('./routes/api');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON body and enable CORS
 app.use(cors());
 app.use(express.json());
 
-// Main API routes
 app.use('/', routes);
 
-// Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
