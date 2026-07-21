@@ -9,7 +9,7 @@ const findLocation = async (query) => {
         addressdetails: 1
       },
       headers: {
-        'User-Agent': 'DataAcquisitionEngine/1.0 (contact@example.com)'
+        'User-Agent': 'DataAcquisitionEngine-MuhammadPutra/1.0 (muhammadputra.test@gmail.com)'
       },
       timeout: 10000 // 10 seconds timeout
     });
